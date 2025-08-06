@@ -402,7 +402,7 @@ public class MapMarker extends MapFeature {
 
     @Override
     public void removeFromMap(Object collection) {
-        clearDrawableCache();
+        clearCachedBitmap();
         if (marker == null) {
             return;
         }
@@ -469,10 +469,13 @@ public class MapMarker extends MapFeature {
         update(true);
     }
 
-    private Bitmap mLastBitmapCreated = null;
+    private Bitmap cachedBitmap = null;
 
-    private void clearDrawableCache() {
-        mLastBitmapCreated = null;
+    private void clearCachedBitmap() {
+        if (cachedBitmap != null && !cachedBitmap.isRecycled()) {
+            cachedBitmap.recycle();
+            cachedBitmap = null;
+        }
     }
 
     private Bitmap createDrawable() {
@@ -480,14 +483,15 @@ public class MapMarker extends MapFeature {
         int height = this.height <= 0 ? 100 : this.height;
 
         // Do not create the doublebuffer-bitmap each time. reuse it to save memory.
-        Bitmap bitmap = mLastBitmapCreated;
+        Bitmap bitmap = cachedBitmap;
 
         if (bitmap == null ||
                 bitmap.isRecycled() ||
                 bitmap.getWidth() != width ||
                 bitmap.getHeight() != height) {
+            clearCachedBitmap();
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            mLastBitmapCreated = bitmap;
+            cachedBitmap = bitmap;
         } else {
             bitmap.eraseColor(Color.TRANSPARENT);
         }
