@@ -1,5 +1,7 @@
 package com.rnmaps.maps;
 
+import android.animation.ObjectAnimator;
+import android.animation.TypeEvaluator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -8,14 +10,9 @@ import android.graphics.Color;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.util.Property;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.animation.ObjectAnimator;
-import android.util.Property;
-import android.animation.TypeEvaluator;
-
-import android.os.Handler;
-import android.os.Looper;
 
 import androidx.annotation.Nullable;
 
@@ -92,17 +89,14 @@ public class MapMarker extends MapFeature {
     private float calloutAnchorY;
     private boolean calloutAnchorIsSet;
 
-    private int updated = 0;
-
     private boolean tracksViewChanges = true;
-    private boolean tracksViewChangesActive = false;
 
     private boolean hasCustomMarkerView = false;
     private final MapMarkerManager markerManager;
     private String imageUri;
     private boolean loadingImage;
 
-    private final DraweeHolder<?> logoHolder;
+    private DraweeHolder<?> logoHolder;
     private ImageManager.OnImageLoadedListener imageLoadedListener;
     private DataSource<CloseableReference<CloseableImage>> dataSource;
     private final ControllerListener<ImageInfo> mLogoControllerListener =
@@ -156,28 +150,6 @@ public class MapMarker extends MapFeature {
         super(context);
         this.context = context;
         this.markerManager = markerManager;
-        logoHolder = DraweeHolder.create(createDraweeHierarchy(), context);
-        logoHolder.onAttach();
-    }
-
-    public MapMarker(Context context, MarkerOptions options, MapMarkerManager markerManager) {
-        super(context);
-        this.context = context;
-        this.markerManager = markerManager;
-        logoHolder = DraweeHolder.create(createDraweeHierarchy(), context);
-        logoHolder.onAttach();
-
-        position = options.getPosition();
-        setAnchor(options.getAnchorU(), options.getAnchorV());
-        setCalloutAnchor(options.getInfoWindowAnchorU(), options.getInfoWindowAnchorV());
-        setTitle(options.getTitle());
-        setSnippet(options.getSnippet());
-        setRotation(options.getRotation());
-        setFlat(options.isFlat());
-        setDraggable(options.isDraggable());
-        setZIndex(Math.round(options.getZIndex()));
-        setOpacity(options.getAlpha());
-        iconBitmapDescriptor = options.getIcon();
     }
 
     private GenericDraweeHierarchy createDraweeHierarchy() {
@@ -196,12 +168,10 @@ public class MapMarker extends MapFeature {
         if (marker != null) {
             marker.setPosition(position);
         }
-        update(false);
     }
 
     public void setIdentifier(String identifier) {
         this.identifier = identifier;
-        update(false);
     }
 
     public String getIdentifier() {
@@ -213,7 +183,6 @@ public class MapMarker extends MapFeature {
         if (marker != null) {
             marker.setTitle(title);
         }
-        update(false);
     }
 
     public void setSnippet(String snippet) {
@@ -221,7 +190,6 @@ public class MapMarker extends MapFeature {
         if (marker != null) {
             marker.setSnippet(snippet);
         }
-        update(false);
     }
 
     public void setRotation(float rotation) {
@@ -229,7 +197,6 @@ public class MapMarker extends MapFeature {
         if (marker != null) {
             marker.setRotation(rotation);
         }
-        update(false);
     }
 
     public void setFlat(boolean flat) {
@@ -245,7 +212,6 @@ public class MapMarker extends MapFeature {
         if (marker != null) {
             marker.setDraggable(draggable);
         }
-        update(false);
     }
 
     public void setZIndex(int zIndex) {
@@ -261,7 +227,6 @@ public class MapMarker extends MapFeature {
         if (marker != null) {
             marker.setAlpha(opacity);
         }
-        update(false);
     }
 
     public void setMarkerHue(float markerHue) {
@@ -276,7 +241,6 @@ public class MapMarker extends MapFeature {
         if (marker != null) {
             marker.setAnchor(anchorX, anchorY);
         }
-        update(false);
     }
 
     public void setCalloutAnchor(double x, double y) {
@@ -286,54 +250,14 @@ public class MapMarker extends MapFeature {
         if (marker != null) {
             marker.setInfoWindowAnchor(calloutAnchorX, calloutAnchorY);
         }
-        update(false);
     }
 
     public void setTracksViewChanges(boolean tracksViewChanges) {
         this.tracksViewChanges = tracksViewChanges;
-        updateTracksViewChanges();
-    }
-
-    private void updateTracksViewChanges() {
-        boolean shouldTrack = tracksViewChanges && hasCustomMarkerView && marker != null;
-        if (shouldTrack == tracksViewChangesActive) return;
-        tracksViewChangesActive = shouldTrack;
-
-        if (shouldTrack) {
-            ViewChangesTracker.getInstance().addMarker(this);
-        } else {
-            ViewChangesTracker.getInstance().removeMarker(this);
-
-            // Let it render one more time to avoid race conditions.
-            // i.e. Image onLoad ->
-            //      ViewChangesTracker may not get a chance to render ->
-            //      setState({ tracksViewChanges: false }) ->
-            //      image loaded but not rendered.
-            updateMarkerIcon();
-        }
     }
 
     public LatLng getPosition() {
         return position;
-    }
-
-    public boolean updateCustomForTracking() {
-        if (!tracksViewChangesActive || updated == 0) {
-            tracksViewChangesActive = false;
-            return false;
-        }
-
-        updateMarkerIcon();
-        if (updated > 0){
-            updated--;
-        }
-        return true;
-    }
-
-    public void updateMarkerIcon() {
-        if (marker == null) return;
-
-        marker.setIcon(getIcon());
     }
 
     public LatLng interpolate(float fraction, LatLng a, LatLng b) {
@@ -399,6 +323,10 @@ public class MapMarker extends MapFeature {
 
             ImagePipeline imagePipeline = Fresco.getImagePipeline();
             dataSource = imagePipeline.fetchDecodedImage(imageRequest, this);
+            if (logoHolder == null) {
+                logoHolder = DraweeHolder.create(createDraweeHierarchy(), context);
+                logoHolder.onAttach();
+            }
             DraweeController controller = Fresco.newDraweeControllerBuilder()
                     .setImageRequest(imageRequest)
                     .setControllerListener(mLogoControllerListener)
@@ -444,34 +372,20 @@ public class MapMarker extends MapFeature {
 
     @Override
     public void addView(View child, int index) {
-        super.addView(child, index);
         // if children are added, it means we are rendering a custom marker
         if (!(child instanceof MapCallout)) {
             hasCustomMarkerView = true;
-            updateTracksViewChanges();
         }
-        update(true);
-    }
-
-    @Override
-    public void requestLayout() {
-        super.requestLayout();
-
-        if (getChildCount() == 0) {
-            if (hasCustomMarkerView) {
-                hasCustomMarkerView = false;
-                clearDrawableCache();
-                updateTracksViewChanges();
-                update(true);
-            }
-        } else {
-            // custom subview
-            if (!(getChildAt(0) instanceof MapCallout)) {
-                if (updated == 0) {
-                    updated = 1;
-                    updateTracksViewChanges();
+        super.addView(child, index);
+        if (index == 0) {
+            child.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                @Override
+                public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                    width = right - left;
+                    height = bottom - top;
+                    update(true);
                 }
-            }
+            });
         }
     }
 
@@ -484,18 +398,17 @@ public class MapMarker extends MapFeature {
     public void addToMap(Object collection) {
         MarkerManager.Collection markerCollection = (MarkerManager.Collection) collection;
         marker = markerCollection.addMarker(getMarkerOptions());
-        updateTracksViewChanges();
     }
 
     @Override
     public void removeFromMap(Object collection) {
+        clearDrawableCache();
         if (marker == null) {
             return;
         }
         MarkerManager.Collection markerCollection = (MarkerManager.Collection) collection;
         markerCollection.remove(marker);
         marker = null;
-        updateTracksViewChanges();
     }
 
     private BitmapDescriptor getIcon() {
@@ -522,7 +435,7 @@ public class MapMarker extends MapFeature {
         }
     }
 
-    private MarkerOptions fillMarkerOptions(MarkerOptions options) {
+    private void fillMarkerOptions(MarkerOptions options) {
         options.position(position);
         if (anchorIsSet) options.anchor(anchorX, anchorY);
         if (calloutAnchorIsSet) options.infoWindowAnchor(calloutAnchorX, calloutAnchorY);
@@ -533,48 +446,27 @@ public class MapMarker extends MapFeature {
         options.draggable(draggable);
         options.zIndex(zIndex);
         options.alpha(opacity);
-        options.icon(getIcon());
-        return options;
+        // if custom marker onLayout is required
+        if (!hasCustomMarkerView) {
+            options.icon(getIcon());
+        }
     }
 
-    public void update(boolean updateIcon) {
+    public void update(boolean forceUpdate) {
         if (marker == null) {
             return;
         }
-
-        if (updateIcon)
-            updateMarkerIcon();
-
-        if (anchorIsSet) {
-            marker.setAnchor(anchorX, anchorY);
-        } else {
-            marker.setAnchor(0.5f, 1.0f);
-        }
-
-        if (calloutAnchorIsSet) {
-            marker.setInfoWindowAnchor(calloutAnchorX, calloutAnchorY);
-        } else {
-            marker.setInfoWindowAnchor(0.5f, 0);
-        }
-        updated +=1;
+        if (tracksViewChanges || forceUpdate)
+            marker.setIcon(getIcon());
     }
 
-    public void update(int width, int height) {
+    public void setLayoutDimensions(int width, int height) {
         this.width = width;
         this.height = height;
-        updated +=1;
-        updateTracksViewChanges();
-        clearDrawableCache();
-        update(true);
     }
 
     public void redraw() {
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                updateMarkerIcon();
-            }
-        });
+        update(true);
     }
 
     private Bitmap mLastBitmapCreated = null;
@@ -692,14 +584,6 @@ public class MapMarker extends MapFeature {
         this.imageLoadedListener = imageLoadedListener;
     }
 
-    public void setUpdated(boolean updated) {
-        if (updated) {
-            this.updated += 1;
-        } else {
-            this.updated = 0;
-        }
-    }
-
     @FunctionalInterface
     public interface EventCreator<T extends Event> {
         T create(int surfaceId, int viewId, WritableMap payload);
@@ -739,11 +623,4 @@ public class MapMarker extends MapFeature {
                 OnDragEndEvent.EVENT_NAME, MapBuilder.of("registrationName", OnDragEndEvent.EVENT_NAME)
         );
     }
-
-  @Override
-  protected void onLayout(boolean changed, int l, int t, int r, int b) {
-    super.onLayout(changed, l, t, r, b);
-    this.height = b-t;
-    this.width = r-l;
-  }
 }
