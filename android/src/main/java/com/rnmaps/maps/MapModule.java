@@ -1,6 +1,5 @@
 package com.rnmaps.maps;
 
-import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.location.Address;
@@ -55,10 +54,6 @@ public class MapModule extends ReactContextBaseJavaModule {
         final Map<String, Object> constants = new HashMap<>();
         constants.put("legalNotice", "This license information is displayed in Settings > Google > Open Source on any device running Google Play services.");
         return constants;
-    }
-
-    public Activity getActivity() {
-        return getCurrentActivity();
     }
 
     public static void closeQuietly(Closeable closeable) {

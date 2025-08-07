@@ -15,9 +15,9 @@ import com.facebook.react.uimanager.LayoutShadowNode;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -321,7 +321,7 @@ public class MapMarkerManager extends ViewGroupManager<MapMarker> {
                 break;
 
             case "redraw":
-                view.updateMarkerIcon();
+                view.update(true);
                 break;
         }
     }
@@ -363,6 +363,6 @@ public class MapMarkerManager extends ViewGroupManager<MapMarker> {
         HashMap<String, Float> data = (HashMap<String, Float>) extraData;
         float width = data.get("width");
         float height = data.get("height");
-        view.update((int) width, (int) height);
+        view.setLayoutDimensions((int) width, (int) height);
     }
 }
