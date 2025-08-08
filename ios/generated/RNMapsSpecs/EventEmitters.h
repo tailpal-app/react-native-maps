@@ -352,6 +352,20 @@ class RNMapsGooglePolygonEventEmitter : public ViewEventEmitter {
     };
   void onPress(OnPress value) const;
 };
+class RNMapsHeatmapEventEmitter : public ViewEventEmitter {
+ public:
+  using ViewEventEmitter::ViewEventEmitter;
+
+  
+  
+};
+class RNMapsLocalTileEventEmitter : public ViewEventEmitter {
+ public:
+  using ViewEventEmitter::ViewEventEmitter;
+
+  
+  
+};
 class RNMapsMapViewEventEmitter : public ViewEventEmitter {
  public:
   using ViewEventEmitter::ViewEventEmitter;

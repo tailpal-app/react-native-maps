@@ -92,7 +92,7 @@ public class MapMarker extends MapFeature {
     private boolean tracksViewChanges = true;
 
     private boolean hasCustomMarkerView = false;
-    private final MapMarkerManager markerManager;
+    private final com.rnmaps.fabric.MarkerManager markerManager;
     private String imageUri;
     private boolean loadingImage;
 
@@ -146,10 +146,32 @@ public class MapMarker extends MapFeature {
                 }
             };
 
-    public MapMarker(Context context, MapMarkerManager markerManager) {
+    public MapMarker(Context context, com.rnmaps.fabric.MarkerManager markerManager) {
         super(context);
         this.context = context;
         this.markerManager = markerManager;
+        logoHolder = DraweeHolder.create(createDraweeHierarchy(), context);
+        logoHolder.onAttach();
+    }
+
+    public MapMarker(Context context, MarkerOptions options, com.rnmaps.fabric.MarkerManager markerManager) {
+        super(context);
+        this.context = context;
+        this.markerManager = markerManager;
+        logoHolder = DraweeHolder.create(createDraweeHierarchy(), context);
+        logoHolder.onAttach();
+
+        position = options.getPosition();
+        setAnchor(options.getAnchorU(), options.getAnchorV());
+        setCalloutAnchor(options.getInfoWindowAnchorU(), options.getInfoWindowAnchorV());
+        setTitle(options.getTitle());
+        setSnippet(options.getSnippet());
+        setRotation(options.getRotation());
+        setFlat(options.isFlat());
+        setDraggable(options.isDraggable());
+        setZIndex(Math.round(options.getZIndex()));
+        setOpacity(options.getAlpha());
+        iconBitmapDescriptor = options.getIcon();
     }
 
     private GenericDraweeHierarchy createDraweeHierarchy() {
@@ -301,7 +323,7 @@ public class MapMarker extends MapFeature {
             }
             if (uri != null) {
                 // listening for marker bitmap descriptor update, as well as check whether to load the image.
-                MapMarkerManager.AirMapMarkerSharedIcon sharedIcon = this.markerManager.getSharedIcon(uri);
+                com.rnmaps.fabric.MarkerManager.AirMapMarkerSharedIcon sharedIcon = this.markerManager.getSharedIcon(uri);
                 sharedIcon.addMarker(this);
                 shouldLoadImage = sharedIcon.shouldLoadImage();
             }

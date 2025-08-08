@@ -1,32 +1,157 @@
 package com.rnmaps.fabric;
 
 
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.view.View;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.uimanager.ReactStylesDiffMap;
-import com.facebook.react.uimanager.StateWrapper;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.ViewManagerDelegate;
 import com.facebook.react.viewmanagers.RNMapsMarkerManagerDelegate;
 import com.facebook.react.viewmanagers.RNMapsMarkerManagerInterface;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.rnmaps.maps.MapCallout;
 import com.rnmaps.maps.MapMarker;
 
 import java.util.Map;
+import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 @ReactModule(name = MarkerManager.REACT_CLASS)
 public class MarkerManager extends ViewGroupManager<MapMarker> implements RNMapsMarkerManagerInterface<MapMarker> {
 
+    public static class AirMapMarkerSharedIcon {
+        private BitmapDescriptor iconBitmapDescriptor;
+        private Bitmap bitmap;
+        private final Map<MapMarker, Boolean> markers;
+        private boolean loadImageStarted;
+
+        public AirMapMarkerSharedIcon() {
+            this.markers = new WeakHashMap<>();
+            this.loadImageStarted = false;
+        }
+
+        /**
+         * check whether the load image process started.
+         * caller AirMapMarker will only need to load it when this returns true.
+         *
+         * @return true if it is not started, false otherwise.
+         */
+        public synchronized boolean shouldLoadImage() {
+            if (!this.loadImageStarted) {
+                this.loadImageStarted = true;
+                return true;
+            }
+            return false;
+        }
+
+        /**
+         * subscribe icon update for given marker.
+         * <p>
+         * The marker is wrapped in weakReference, so no need to remove it explicitly.
+         *
+         * @param marker
+         */
+        public synchronized void addMarker(MapMarker marker) {
+            this.markers.put(marker, true);
+            if (this.iconBitmapDescriptor != null) {
+                marker.setIconBitmapDescriptor(this.iconBitmapDescriptor, this.bitmap);
+            }
+        }
+
+        /**
+         * Remove marker from this shared icon.
+         * <p>
+         * Marker will only need to call it when the marker receives a different marker image uri.
+         *
+         * @param marker
+         */
+        public synchronized void removeMarker(MapMarker marker) {
+            this.markers.remove(marker);
+        }
+
+        /**
+         * check if there is markers still listening on this icon.
+         * when there are not markers listen on it, we can remove it.
+         *
+         * @return true if there is, false otherwise
+         */
+        public synchronized boolean hasMarker() {
+            return this.markers.isEmpty();
+        }
+
+        /**
+         * Update the bitmap descriptor and bitmap for the image uri.
+         * And notify all subscribers about the update.
+         *
+         * @param bitmapDescriptor
+         * @param bitmap
+         */
+        public synchronized void updateIcon(BitmapDescriptor bitmapDescriptor, Bitmap bitmap) {
+
+            this.iconBitmapDescriptor = bitmapDescriptor;
+            this.bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+
+            if (this.markers.isEmpty()) {
+                return;
+            }
+
+            for (Map.Entry<MapMarker, Boolean> markerEntry : markers.entrySet()) {
+                if (markerEntry.getKey() != null) {
+                    markerEntry.getKey().setIconBitmapDescriptor(bitmapDescriptor, bitmap);
+                }
+            }
+        }
+    }
+
+    private final Map<String, AirMapMarkerSharedIcon> sharedIcons = new ConcurrentHashMap<>();
+
+    /**
+     * get the shared icon object, if not existed, create a new one and store it.
+     *
+     * @param uri
+     * @return the icon object for the given uri.
+     */
+    public AirMapMarkerSharedIcon getSharedIcon(String uri) {
+        AirMapMarkerSharedIcon icon = this.sharedIcons.get(uri);
+        if (icon == null) {
+            synchronized (this) {
+                if ((icon = this.sharedIcons.get(uri)) == null) {
+                    icon = new AirMapMarkerSharedIcon();
+                    this.sharedIcons.put(uri, icon);
+                }
+            }
+        }
+        return icon;
+    }
+
+    /**
+     * Remove the share icon object from our sharedIcons map when no markers are listening for it.
+     *
+     * @param uri
+     */
+    public void removeSharedIconIfEmpty(String uri) {
+        AirMapMarkerSharedIcon icon = this.sharedIcons.get(uri);
+        if (icon == null) {
+            return;
+        }
+        if (!icon.hasMarker()) {
+            synchronized (this) {
+                if ((icon = this.sharedIcons.get(uri)) != null && !icon.hasMarker()) {
+                    this.sharedIcons.remove(uri);
+                }
+            }
+        }
+    }
 
     public MarkerManager(ReactApplicationContext context) {
         super(context);
@@ -47,7 +172,54 @@ public class MarkerManager extends ViewGroupManager<MapMarker> implements RNMaps
 
     @Override
     public MapMarker createViewInstance(ThemedReactContext context) {
-        return new MapMarker(context, null);
+        return new MapMarker(context, this);
+    }
+
+    private MarkerOptions optionsForInitialProps(ReactStylesDiffMap initialProps) {
+        MarkerOptions options = new MarkerOptions();
+        if (initialProps != null) {
+            if (initialProps.hasKey("opacity")) {
+                options.alpha(initialProps.getFloat("opacity", 1));
+            }
+            if (initialProps.hasKey("anchor")) {
+                ReadableMap map = initialProps.getMap("anchor");
+                float x = (float) (map != null && map.hasKey("x") ? map.getDouble("x") : 0.5);
+                float y = (float) (map != null && map.hasKey("y") ? map.getDouble("y") : 1.0);
+                options.anchor(x, y);
+            }
+
+            if (initialProps.hasKey("coordinate")) {
+                ReadableMap coordinate = initialProps.getMap("coordinate");
+                LatLng position = new LatLng(coordinate.getDouble("latitude"), coordinate.getDouble("longitude"));
+                options.position(position);
+            }
+            if (initialProps.hasKey("title")) {
+                options.title(initialProps.getString("title"));
+            }
+            if (initialProps.hasKey("description")) {
+                options.snippet(initialProps.getString("description"));
+            }
+            if (initialProps.hasKey("draggable")) {
+                options.draggable(initialProps.getBoolean("draggable", false));
+            }
+            if (initialProps.hasKey("rotation")) {
+                options.rotation(initialProps.getFloat("rotation", 0));
+            }
+            if (initialProps.hasKey("flat")) {
+                options.flat(initialProps.getBoolean("flat", false));
+            }
+            if (initialProps.hasKey("calloutAnchor")) {
+                ReadableMap map = initialProps.getMap("calloutAnchor");
+                float x = (float) (map != null && map.hasKey("x") ? map.getDouble("x") : 0.5);
+                float y = (float) (map != null && map.hasKey("y") ? map.getDouble("y") : 1.0);
+                options.infoWindowAnchor(x, y);
+            }
+
+            if (initialProps.hasKey("zIndex")) {
+                options.zIndex(initialProps.getFloat("zIndex", 0));
+            }
+        }
+        return options;
     }
 
     @Override

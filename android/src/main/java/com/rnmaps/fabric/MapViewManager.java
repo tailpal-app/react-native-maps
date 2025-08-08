@@ -1,8 +1,6 @@
 package com.rnmaps.fabric;
 
 
-import static com.rnmaps.maps.MapManager.MY_LOCATION_PRIORITY;
-
 import android.util.Log;
 import android.view.View;
 
@@ -22,6 +20,7 @@ import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.ViewManagerDelegate;
 import com.facebook.react.viewmanagers.RNMapsMapViewManagerDelegate;
 import com.facebook.react.viewmanagers.RNMapsMapViewManagerInterface;
+import com.google.android.gms.location.Priority;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.MapsInitializer;
@@ -184,7 +183,6 @@ public class MapViewManager extends ViewGroupManager<MapView> implements RNMapsM
     public Map<String, Object> getExportedCustomBubblingEventTypeConstants() {
         return MapView.getExportedCustomBubblingEventTypeConstants();
     }
-
 
     @Override
     public LayoutShadowNode createShadowNodeInstance() {
@@ -482,7 +480,14 @@ public class MapViewManager extends ViewGroupManager<MapView> implements RNMapsM
 
     @Override
     public void setUserLocationPriority(MapView view, @Nullable String value) {
-        view.setUserLocationPriority(MY_LOCATION_PRIORITY.get(value));
+        ///  TODO: map in js
+        int priority = switch (value != null ? value : "balanced") {
+            case "high" -> Priority.PRIORITY_HIGH_ACCURACY;
+            case "low" -> Priority.PRIORITY_LOW_POWER;
+            case "passive" -> Priority.PRIORITY_PASSIVE;
+            default -> Priority.PRIORITY_BALANCED_POWER_ACCURACY;
+        };
+        view.setUserLocationPriority(priority);
     }
 
     @Override
