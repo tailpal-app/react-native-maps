@@ -1,14 +1,13 @@
 package com.rnmaps.maps;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
+import com.google.maps.android.heatmaps.Gradient;
 import com.google.maps.android.heatmaps.HeatmapTileProvider;
 import com.google.maps.android.heatmaps.WeightedLatLng;
-import com.google.maps.android.heatmaps.Gradient;
 
 import java.util.Arrays;
 import java.util.List;
@@ -47,7 +46,7 @@ public class MapHeatmap extends MapFeature {
             heatmap.clearTileCache();
         }
     }
-    
+
     public void setOpacity(double opacity) {
         this.opacity = opacity;
         if (heatmapTileProvider != null) {
@@ -79,7 +78,7 @@ public class MapHeatmap extends MapFeature {
         TileOverlayOptions options = new TileOverlayOptions();
         if (heatmapTileProvider == null) {
             HeatmapTileProvider.Builder builder =
-                new HeatmapTileProvider.Builder().weightedData(this.points);
+                    new HeatmapTileProvider.Builder().weightedData(this.points);
             if (radius != null) {
                 builder.radius(radius);
             }

@@ -62,6 +62,28 @@ using RNMapsGooglePolygonShadowNode = ConcreteViewShadowNode<
     RNMapsGooglePolygonEventEmitter,
     RNMapsGooglePolygonState>;
 
+JSI_EXPORT extern const char RNMapsHeatmapComponentName[];
+
+/*
+ * `ShadowNode` for <RNMapsHeatmap> component.
+ */
+using RNMapsHeatmapShadowNode = ConcreteViewShadowNode<
+    RNMapsHeatmapComponentName,
+    RNMapsHeatmapProps,
+    RNMapsHeatmapEventEmitter,
+    RNMapsHeatmapState>;
+
+JSI_EXPORT extern const char RNMapsLocalTileComponentName[];
+
+/*
+ * `ShadowNode` for <RNMapsLocalTile> component.
+ */
+using RNMapsLocalTileShadowNode = ConcreteViewShadowNode<
+    RNMapsLocalTileComponentName,
+    RNMapsLocalTileProps,
+    RNMapsLocalTileEventEmitter,
+    RNMapsLocalTileState>;
+
 JSI_EXPORT extern const char RNMapsMapViewComponentName[];
 
 /*

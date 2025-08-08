@@ -88,6 +88,25 @@ RNMapsGooglePolygonProps::RNMapsGooglePolygonProps(
     holes(convertRawProp(context, rawProps, "holes", sourceProps.holes, {})),
     tappable(convertRawProp(context, rawProps, "tappable", sourceProps.tappable, {false}))
       {}
+RNMapsHeatmapProps::RNMapsHeatmapProps(
+    const PropsParserContext &context,
+    const RNMapsHeatmapProps &sourceProps,
+    const RawProps &rawProps): ViewProps(context, sourceProps, rawProps),
+
+    gradient(convertRawProp(context, rawProps, "gradient", sourceProps.gradient, {})),
+    opacity(convertRawProp(context, rawProps, "opacity", sourceProps.opacity, {0.0})),
+    points(convertRawProp(context, rawProps, "points", sourceProps.points, {})),
+    radius(convertRawProp(context, rawProps, "radius", sourceProps.radius, {0.0}))
+      {}
+RNMapsLocalTileProps::RNMapsLocalTileProps(
+    const PropsParserContext &context,
+    const RNMapsLocalTileProps &sourceProps,
+    const RawProps &rawProps): ViewProps(context, sourceProps, rawProps),
+
+    pathTemplate(convertRawProp(context, rawProps, "pathTemplate", sourceProps.pathTemplate, {})),
+    tileSize(convertRawProp(context, rawProps, "tileSize", sourceProps.tileSize, {0})),
+    useAssets(convertRawProp(context, rawProps, "useAssets", sourceProps.useAssets, {false}))
+      {}
 RNMapsMapViewProps::RNMapsMapViewProps(
     const PropsParserContext &context,
     const RNMapsMapViewProps &sourceProps,
@@ -159,6 +178,7 @@ RNMapsMarkerProps::RNMapsMarkerProps(
     description(convertRawProp(context, rawProps, "description", sourceProps.description, {})),
     draggable(convertRawProp(context, rawProps, "draggable", sourceProps.draggable, {false})),
     title(convertRawProp(context, rawProps, "title", sourceProps.title, {})),
+    tracksViewChanges(convertRawProp(context, rawProps, "tracksViewChanges", sourceProps.tracksViewChanges, {true})),
     identifier(convertRawProp(context, rawProps, "identifier", sourceProps.identifier, {})),
     isPreselected(convertRawProp(context, rawProps, "isPreselected", sourceProps.isPreselected, {false})),
     opacity(convertRawProp(context, rawProps, "opacity", sourceProps.opacity, {1.0})),

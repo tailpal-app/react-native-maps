@@ -98,7 +98,7 @@ public class MapMarker extends MapFeature {
     private boolean tracksViewChangesActive = false;
 
     private boolean hasCustomMarkerView = false;
-    private final MapMarkerManager markerManager;
+    private final com.rnmaps.fabric.MarkerManager markerManager;
     private String imageUri;
     private boolean loadingImage;
 
@@ -152,7 +152,7 @@ public class MapMarker extends MapFeature {
                 }
             };
 
-    public MapMarker(Context context, MapMarkerManager markerManager) {
+    public MapMarker(Context context, com.rnmaps.fabric.MarkerManager markerManager) {
         super(context);
         this.context = context;
         this.markerManager = markerManager;
@@ -160,7 +160,7 @@ public class MapMarker extends MapFeature {
         logoHolder.onAttach();
     }
 
-    public MapMarker(Context context, MarkerOptions options, MapMarkerManager markerManager) {
+    public MapMarker(Context context, MarkerOptions options, com.rnmaps.fabric.MarkerManager markerManager) {
         super(context);
         this.context = context;
         this.markerManager = markerManager;
@@ -377,7 +377,7 @@ public class MapMarker extends MapFeature {
             }
             if (uri != null) {
                 // listening for marker bitmap descriptor update, as well as check whether to load the image.
-                MapMarkerManager.AirMapMarkerSharedIcon sharedIcon = this.markerManager.getSharedIcon(uri);
+                com.rnmaps.fabric.MarkerManager.AirMapMarkerSharedIcon sharedIcon = this.markerManager.getSharedIcon(uri);
                 sharedIcon.addMarker(this);
                 shouldLoadImage = sharedIcon.shouldLoadImage();
             }

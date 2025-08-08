@@ -484,6 +484,94 @@ class RNMapsGooglePolygonProps final : public ViewProps {
   bool tappable{false};
 };
 
+struct RNMapsHeatmapGradientStruct {
+  int colorMapSize{0};
+  std::vector<std::string> colors{};
+  std::vector<double> startPoints{};
+};
+
+static inline void fromRawValue(const PropsParserContext& context, const RawValue &value, RNMapsHeatmapGradientStruct &result) {
+  auto map = (std::unordered_map<std::string, RawValue>)value;
+
+  auto tmp_colorMapSize = map.find("colorMapSize");
+  if (tmp_colorMapSize != map.end()) {
+    fromRawValue(context, tmp_colorMapSize->second, result.colorMapSize);
+  }
+  auto tmp_colors = map.find("colors");
+  if (tmp_colors != map.end()) {
+    fromRawValue(context, tmp_colors->second, result.colors);
+  }
+  auto tmp_startPoints = map.find("startPoints");
+  if (tmp_startPoints != map.end()) {
+    fromRawValue(context, tmp_startPoints->second, result.startPoints);
+  }
+}
+
+static inline std::string toString(const RNMapsHeatmapGradientStruct &value) {
+  return "[Object RNMapsHeatmapGradientStruct]";
+}
+
+struct RNMapsHeatmapPointsStruct {
+  double latitude{0.0};
+  double longitude{0.0};
+  double weight{0.0};
+};
+
+static inline void fromRawValue(const PropsParserContext& context, const RawValue &value, RNMapsHeatmapPointsStruct &result) {
+  auto map = (std::unordered_map<std::string, RawValue>)value;
+
+  auto tmp_latitude = map.find("latitude");
+  if (tmp_latitude != map.end()) {
+    fromRawValue(context, tmp_latitude->second, result.latitude);
+  }
+  auto tmp_longitude = map.find("longitude");
+  if (tmp_longitude != map.end()) {
+    fromRawValue(context, tmp_longitude->second, result.longitude);
+  }
+  auto tmp_weight = map.find("weight");
+  if (tmp_weight != map.end()) {
+    fromRawValue(context, tmp_weight->second, result.weight);
+  }
+}
+
+static inline std::string toString(const RNMapsHeatmapPointsStruct &value) {
+  return "[Object RNMapsHeatmapPointsStruct]";
+}
+
+static inline void fromRawValue(const PropsParserContext& context, const RawValue &value, std::vector<RNMapsHeatmapPointsStruct> &result) {
+  auto items = (std::vector<RawValue>)value;
+  for (const auto &item : items) {
+    RNMapsHeatmapPointsStruct newItem;
+    fromRawValue(context, item, newItem);
+    result.emplace_back(newItem);
+  }
+}
+
+class RNMapsHeatmapProps final : public ViewProps {
+ public:
+  RNMapsHeatmapProps() = default;
+  RNMapsHeatmapProps(const PropsParserContext& context, const RNMapsHeatmapProps &sourceProps, const RawProps &rawProps);
+
+#pragma mark - Props
+
+  RNMapsHeatmapGradientStruct gradient{};
+  double opacity{0.0};
+  std::vector<RNMapsHeatmapPointsStruct> points{};
+  double radius{0.0};
+};
+
+class RNMapsLocalTileProps final : public ViewProps {
+ public:
+  RNMapsLocalTileProps() = default;
+  RNMapsLocalTileProps(const PropsParserContext& context, const RNMapsLocalTileProps &sourceProps, const RawProps &rawProps);
+
+#pragma mark - Props
+
+  std::string pathTemplate{};
+  int tileSize{0};
+  bool useAssets{false};
+};
+
 enum class RNMapsMapViewGoogleRenderer { LATEST, LEGACY };
 
 static inline void fromRawValue(const PropsParserContext& context, const RawValue &value, RNMapsMapViewGoogleRenderer &result) {

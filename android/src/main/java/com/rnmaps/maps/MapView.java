@@ -306,13 +306,6 @@ public class MapView extends com.google.android.gms.maps.MapView implements Goog
         addView(attacherGroup);
     }
 
-    public MapView(ThemedReactContext reactContext, ReactApplicationContext appContext,
-                   MapManager manager,
-                   GoogleMapOptions googleMapOptions) {
-        this(null, googleMapOptions);
-
-    }
-
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();

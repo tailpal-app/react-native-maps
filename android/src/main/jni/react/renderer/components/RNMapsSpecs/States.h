@@ -62,6 +62,30 @@ public:
 #endif
 };
 
+class RNMapsHeatmapState {
+public:
+  RNMapsHeatmapState() = default;
+
+#ifdef ANDROID
+  RNMapsHeatmapState(RNMapsHeatmapState const &previousState, folly::dynamic data){};
+  folly::dynamic getDynamic() const {
+    return {};
+  };
+#endif
+};
+
+class RNMapsLocalTileState {
+public:
+  RNMapsLocalTileState() = default;
+
+#ifdef ANDROID
+  RNMapsLocalTileState(RNMapsLocalTileState const &previousState, folly::dynamic data){};
+  folly::dynamic getDynamic() const {
+    return {};
+  };
+#endif
+};
+
 class RNMapsMapViewState {
 public:
   RNMapsMapViewState() = default;

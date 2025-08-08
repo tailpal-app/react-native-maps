@@ -233,6 +233,14 @@ if ([commandName isEqualToString:@"setIndoorActiveLevelIndex"]) {
 
 @end
 
+@protocol RCTRNMapsHeatmapViewProtocol <NSObject>
+
+@end
+
+@protocol RCTRNMapsLocalTileViewProtocol <NSObject>
+
+@end
+
 @protocol RCTRNMapsMapViewViewProtocol <NSObject>
 - (void)animateToRegion:(NSString *)regionJSON duration:(NSInteger)duration;
 - (void)setCamera:(NSString *)cameraJSON;

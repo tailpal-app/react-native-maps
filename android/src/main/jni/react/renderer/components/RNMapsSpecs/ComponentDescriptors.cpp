@@ -20,6 +20,8 @@ registry->add(concreteComponentDescriptorProvider<RNMapsCalloutComponentDescript
 registry->add(concreteComponentDescriptorProvider<RNMapsCircleComponentDescriptor>());
 registry->add(concreteComponentDescriptorProvider<RNMapsGoogleMapViewComponentDescriptor>());
 registry->add(concreteComponentDescriptorProvider<RNMapsGooglePolygonComponentDescriptor>());
+registry->add(concreteComponentDescriptorProvider<RNMapsHeatmapComponentDescriptor>());
+registry->add(concreteComponentDescriptorProvider<RNMapsLocalTileComponentDescriptor>());
 registry->add(concreteComponentDescriptorProvider<RNMapsMapViewComponentDescriptor>());
 registry->add(concreteComponentDescriptorProvider<RNMapsMarkerComponentDescriptor>());
 registry->add(concreteComponentDescriptorProvider<RNMapsOverlayComponentDescriptor>());

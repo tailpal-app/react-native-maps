@@ -12,6 +12,8 @@ import com.facebook.react.module.model.ReactModuleInfoProvider;
 import com.facebook.react.uimanager.ViewManager;
 import com.rnmaps.fabric.CalloutManager;
 import com.rnmaps.fabric.CircleManager;
+import com.rnmaps.fabric.HeatmapManager;
+import com.rnmaps.fabric.LocalTileManager;
 import com.rnmaps.fabric.MapViewManager;
 import com.rnmaps.fabric.MarkerManager;
 import com.rnmaps.fabric.NativeAirMapsModule;
@@ -38,11 +40,9 @@ public class MapsPackage extends BaseReactPackage implements ReactPackage {
             new OverlayManager(reactContext),
             new UrlTileManager(reactContext),
             new WMSTileManager(reactContext),
-            new MapGradientPolylineManager(reactContext),
-            new MapLocalTileManager(reactContext),
-            new MapHeatmapManager());
+            new LocalTileManager(reactContext),
+            new HeatmapManager(reactContext));
   }
-
 
   @Override
   public NativeModule getModule(String name, ReactApplicationContext reactContext) {
@@ -72,6 +72,12 @@ public class MapsPackage extends BaseReactPackage implements ReactPackage {
     }
     if (WMSTileManager.REACT_CLASS.equals(name)) {
       return new WMSTileManager(reactContext);
+    }
+    if (HeatmapManager.REACT_CLASS.equals(name)) {
+      return new HeatmapManager(reactContext);
+    }
+    if (LocalTileManager.REACT_CLASS.equals(name)) {
+      return new LocalTileManager(reactContext);
     }
     if (NativeAirMapsModuleSpec.NAME.equals(name)) {
       return new NativeAirMapsModule(reactContext);

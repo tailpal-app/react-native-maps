@@ -28,6 +28,8 @@ import FabricCallout from './specs/NativeComponentCallout';
 import FabricPolyline from './specs/NativeComponentPolyline';
 import FabricCircle from './specs/NativeComponentCircle';
 import FabricOverlay from './specs/NativeComponentOverlay';
+import FabricHeatmap from './specs/NativeComponentHeatmap';
+import FabricLocalTile from './specs/NativeComponentLocalTile';
 
 export const SUPPORTED: ImplementationStatus = 'SUPPORTED';
 export const USES_DEFAULT_IMPLEMENTATION: ImplementationStatus =
@@ -115,6 +117,12 @@ export default function decorateMapComponent<Type extends Component>(
         } else if (componentName === 'WMSTile') {
           // @ts-ignore
           return FabricWMSTile;
+        } else if (componentName === 'Heatmap') {
+          // @ts-ignore
+          return FabricHeatmap;
+        } else if (componentName === 'LocalTile') {
+          // @ts-ignore
+          return FabricLocalTile;
         }
       }
       const key = provider || 'default';
