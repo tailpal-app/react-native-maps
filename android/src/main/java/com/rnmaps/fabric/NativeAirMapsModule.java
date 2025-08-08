@@ -1,11 +1,5 @@
 package com.rnmaps.fabric;
 
-import static com.rnmaps.maps.MapModule.SNAPSHOT_FORMAT_JPG;
-import static com.rnmaps.maps.MapModule.SNAPSHOT_FORMAT_PNG;
-import static com.rnmaps.maps.MapModule.SNAPSHOT_RESULT_BASE64;
-import static com.rnmaps.maps.MapModule.SNAPSHOT_RESULT_FILE;
-import static com.rnmaps.maps.MapModule.closeQuietly;
-
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.location.Address;
@@ -13,8 +7,6 @@ import android.location.Geocoder;
 import android.net.Uri;
 import android.util.Base64;
 import android.util.DisplayMetrics;
-
-import androidx.annotation.Nullable;
 
 import com.facebook.fbreact.specs.NativeAirMapsModuleSpec;
 import com.facebook.react.bridge.Arguments;
@@ -24,58 +16,66 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.UIManager;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
+import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.uimanager.UIManagerHelper;
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.rnmaps.maps.MapUIBlock;
 import com.rnmaps.maps.MapView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+@ReactModule(name = NativeAirMapsModule.REACT_CLASS)
 public class NativeAirMapsModule extends NativeAirMapsModuleSpec {
+    private final ReactApplicationContext reactContext;
+
+    public static final String SNAPSHOT_RESULT_FILE = "file";
+    public static final String SNAPSHOT_RESULT_BASE64 = "base64";
+    public static final String SNAPSHOT_FORMAT_PNG = "png";
+    public static final String SNAPSHOT_FORMAT_JPG = "jpg";
+
     public NativeAirMapsModule(ReactApplicationContext reactContext) {
         super(reactContext);
+        this.reactContext = reactContext;
     }
+
+    public static final String REACT_CLASS = "RNMapsAirModule";
 
     @Override
     public String getName() {
-        return NAME;
+        return REACT_CLASS;
     }
 
     @Override
     public void getCamera(double tag, Promise promise) {
-        UIManager uiManager = UIManagerHelper.getUIManagerForReactTag(getReactApplicationContext(), (int) tag);
-        getReactApplicationContext().runOnUiQueueThread(new Runnable() {
-            @Override
-            public void run() {
-                MapView view = (MapView) uiManager.resolveView((int) tag);
-                CameraPosition position = view.map.getCameraPosition();
-                WritableMap map = Arguments.createMap();
-                WritableMap center = Arguments.createMap();
-                center.putDouble("latitude", position.target.latitude);
-                center.putDouble("longitude", position.target.longitude);
-                map.putMap("center", center);
-                map.putDouble("heading", position.bearing);
-                map.putDouble("pitch", position.tilt);
-                map.putDouble("zoom", position.zoom);
-                promise.resolve(map);
-            }
+        UIManager uiManager = UIManagerHelper.getUIManagerForReactTag(reactContext, (int) tag);
+
+        reactContext.runOnUiQueueThread(() -> {
+            MapView view = (MapView) uiManager.resolveView((int) tag);
+            CameraPosition position = view.map.getCameraPosition();
+            WritableMap map = Arguments.createMap();
+            WritableMap center = Arguments.createMap();
+            center.putDouble("latitude", position.target.latitude);
+            center.putDouble("longitude", position.target.longitude);
+            map.putMap("center", center);
+            map.putDouble("heading", position.bearing);
+            map.putDouble("pitch", position.tilt);
+            map.putDouble("zoom", position.zoom);
+            promise.resolve(map);
         });
     }
 
     @Override
     public void getMarkersFrames(double tag, boolean onlyVisible, Promise promise) {
-
-        UIManager uiManager = UIManagerHelper.getUIManagerForReactTag(getReactApplicationContext(), (int) tag);
-        getReactApplicationContext().runOnUiQueueThread(() -> {
+        UIManager uiManager = UIManagerHelper.getUIManagerForReactTag(reactContext, (int) tag);
+        reactContext.runOnUiQueueThread(() -> {
             MapView view = (MapView) uiManager.resolveView((int) tag);
             double[][] boundaries = view.getMarkersFrames(onlyVisible);
             if (boundaries != null) {
@@ -100,8 +100,8 @@ public class NativeAirMapsModule extends NativeAirMapsModuleSpec {
 
     @Override
     public void getMapBoundaries(double tag, Promise promise) {
-        UIManager uiManager = UIManagerHelper.getUIManagerForReactTag(getReactApplicationContext(), (int) tag);
-        getReactApplicationContext().runOnUiQueueThread(() -> {
+        UIManager uiManager = UIManagerHelper.getUIManagerForReactTag(reactContext, (int) tag);
+        reactContext.runOnUiQueueThread(() -> {
             MapView view = (MapView) uiManager.resolveView((int) tag);
             double[][] boundaries = view.getMapBoundaries();
             WritableMap coordinates = new WritableNativeMap();
@@ -129,61 +129,60 @@ public class NativeAirMapsModule extends NativeAirMapsModuleSpec {
                 options = JSONUtil.convertJsonToWritable(jsonObject);
                 WritableMap finalOptions = options;
 
-                final ReactApplicationContext context = getReactApplicationContext();
                 final String format = finalOptions.hasKey("format") ? finalOptions.getString("format") : "png";
                 final Bitmap.CompressFormat compressFormat =
                         format.equals(SNAPSHOT_FORMAT_PNG) ? Bitmap.CompressFormat.PNG :
                                 format.equals(SNAPSHOT_FORMAT_JPG) ? Bitmap.CompressFormat.JPEG : null;
                 final double quality = finalOptions.hasKey("quality") ? finalOptions.getDouble("quality") : 1.0;
-                final DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+                final DisplayMetrics displayMetrics = reactContext.getResources().getDisplayMetrics();
                 final Integer width =
                         finalOptions.hasKey("width") ? (int) (displayMetrics.density * finalOptions.getDouble("width")) : 0;
                 final Integer height =
                         finalOptions.hasKey("height") ? (int) (displayMetrics.density * finalOptions.getDouble("height")) : 0;
                 final String result = finalOptions.hasKey("result") ? finalOptions.getString("result") : "file";
 
-                UIManager uiManager = UIManagerHelper.getUIManagerForReactTag(getReactApplicationContext(), (int) tag);
-                getReactApplicationContext().runOnUiQueueThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        MapView view = (MapView) uiManager.resolveView((int) tag);
-                        view.map.snapshot(snapshot -> {
 
-                            // Convert image to requested width/height if necessary
-                            if (snapshot == null) {
-                                promise.reject("Failed to generate bitmap, snapshot = null");
-                                return;
-                            }
-                            if ((width != 0) && (height != 0) &&
-                                    (width != snapshot.getWidth() || height != snapshot.getHeight())) {
-                                snapshot = Bitmap.createScaledBitmap(snapshot, width, height, true);
-                            }
-                            // Save the snapshot to disk
-                            if (result.equals(SNAPSHOT_RESULT_FILE)) {
-                                File tempFile;
-                                FileOutputStream outputStream;
-                                try {
-                                    tempFile =
-                                            File.createTempFile("AirMapSnapshot", "." + format, context.getCacheDir());
-                                    outputStream = new FileOutputStream(tempFile);
-                                } catch (Exception e) {
-                                    promise.reject(e);
-                                    return;
-                                }
-                                snapshot.compress(compressFormat, (int) (100.0 * quality), outputStream);
-                                closeQuietly(outputStream);
-                                String uri = Uri.fromFile(tempFile).toString();
-                                promise.resolve(uri);
-                            } else if (result.equals(SNAPSHOT_RESULT_BASE64)) {
-                                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                                snapshot.compress(compressFormat, (int) (100.0 * quality), outputStream);
-                                closeQuietly(outputStream);
-                                byte[] bytes = outputStream.toByteArray();
-                                String data = Base64.encodeToString(bytes, Base64.NO_WRAP);
-                                promise.resolve(data);
-                            }
-                        });
-                    }
+                UIManager uiManager = UIManagerHelper.getUIManagerForReactTag(reactContext, (int) tag);
+                reactContext.runOnUiQueueThread(() -> {
+                    MapView view = (MapView) uiManager.resolveView((int) tag);
+                  if(view != null) {
+                      view.map.snapshot(snapshot -> {
+
+                          // Convert image to requested width/height if necessary
+                          if (snapshot == null) {
+                              promise.reject("Failed to generate bitmap, snapshot = null");
+                              return;
+                          }
+                          if ((width != 0) && (height != 0) &&
+                                  (width != snapshot.getWidth() || height != snapshot.getHeight())) {
+                              snapshot = Bitmap.createScaledBitmap(snapshot, width, height, true);
+                          }
+                          // Save the snapshot to disk
+                          if (result.equals(SNAPSHOT_RESULT_FILE)) {
+                              File tempFile;
+                              FileOutputStream outputStream;
+                              try {
+                                  tempFile =
+                                          File.createTempFile("AirMapSnapshot", "." + format, reactContext.getCacheDir());
+                                  outputStream = new FileOutputStream(tempFile);
+                              } catch (Exception e) {
+                                  promise.reject(e);
+                                  return;
+                              }
+                              snapshot.compress(compressFormat, (int) (100.0 * quality), outputStream);
+                              closeQuietly(outputStream);
+                              String uri = Uri.fromFile(tempFile).toString();
+                              promise.resolve(uri);
+                          } else if (result.equals(SNAPSHOT_RESULT_BASE64)) {
+                              ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                              snapshot.compress(compressFormat, (int) (100.0 * quality), outputStream);
+                              closeQuietly(outputStream);
+                              byte[] bytes = outputStream.toByteArray();
+                              String data = Base64.encodeToString(bytes, Base64.NO_WRAP);
+                              promise.resolve(data);
+                          }
+                      });
+                  }
                 });
             }
         } catch (JSONException e) {
@@ -228,21 +227,20 @@ public class NativeAirMapsModule extends NativeAirMapsModuleSpec {
         } catch (IOException e) {
             promise.reject("Can not get address location");
         }
-
-
     }
 
     @Override
     public void getPointForCoordinate(double tag, ReadableMap coordinate, Promise promise) {
-        final ReactApplicationContext context = getReactApplicationContext();
-        final double density = (double) context.getResources().getDisplayMetrics().density;
+        UIManager uiManager = UIManagerHelper.getUIManagerForReactTag(reactContext, (int) tag);
+        reactContext.runOnUiQueueThread(() -> {
+            final double density = reactContext.getResources().getDisplayMetrics().density;
 
-        final LatLng coord = new LatLng(
-                coordinate.hasKey("latitude") ? coordinate.getDouble("latitude") : 0.0,
-                coordinate.hasKey("longitude") ? coordinate.getDouble("longitude") : 0.0
-        );
+            MapView view = (MapView) uiManager.resolveView((int) tag);
+            final LatLng coord = new LatLng(
+                    coordinate.hasKey("latitude") ? coordinate.getDouble("latitude") : 0.0,
+                    coordinate.hasKey("longitude") ? coordinate.getDouble("longitude") : 0.0
+            );
 
-        MapUIBlock uiBlock = new MapUIBlock((int) tag, promise, context, view -> {
             Point pt = view.map.getProjection().toScreenLocation(coord);
 
             WritableMap ptJson = new WritableNativeMap();
@@ -250,24 +248,20 @@ public class NativeAirMapsModule extends NativeAirMapsModuleSpec {
             ptJson.putDouble("y", (double) pt.y / density);
 
             promise.resolve(ptJson);
-
-            return null;
         });
-
-        uiBlock.addToUIManager();
     }
 
     @Override
     public void getCoordinateForPoint(double tag, ReadableMap point, Promise promise) {
-        final ReactApplicationContext context = getReactApplicationContext();
-        final double density = (double) context.getResources().getDisplayMetrics().density;
+        UIManager uiManager = UIManagerHelper.getUIManagerForReactTag(reactContext, (int) tag);
+        reactContext.runOnUiQueueThread(() -> {
+            MapView view = (MapView) uiManager.resolveView((int) tag);
+            final double density = reactContext.getResources().getDisplayMetrics().density;
+            final Point pt = new Point(
+                    point.hasKey("x") ? (int) (point.getDouble("x") * density) : 0,
+                    point.hasKey("y") ? (int) (point.getDouble("y") * density) : 0
+            );
 
-        final Point pt = new Point(
-                point.hasKey("x") ? (int) (point.getDouble("x") * density) : 0,
-                point.hasKey("y") ? (int) (point.getDouble("y") * density) : 0
-        );
-
-        MapUIBlock uiBlock = new MapUIBlock((int)tag, promise, context, view -> {
             LatLng coord = view.map.getProjection().fromScreenLocation(pt);
 
             WritableMap coordJson = new WritableNativeMap();
@@ -275,10 +269,14 @@ public class NativeAirMapsModule extends NativeAirMapsModuleSpec {
             coordJson.putDouble("longitude", coord.longitude);
 
             promise.resolve(coordJson);
-
-            return null;
         });
+    }
 
-        uiBlock.addToUIManager();
+    public void closeQuietly(Closeable closeable) {
+        if (closeable == null) return;
+        try {
+            closeable.close();
+        } catch (IOException ignored) {
+        }
     }
 }

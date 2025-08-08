@@ -24,7 +24,6 @@ import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 
 import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
@@ -132,6 +131,7 @@ public class MapView extends com.google.android.gms.maps.MapView implements Goog
     private boolean showsMyLocationButton = false;
 
     private boolean showsTraffic = false;
+    private int mapType =1;
 
     private boolean handlePanDrag = false;
     private boolean moveOnMarkerPress = true;
@@ -361,7 +361,6 @@ public class MapView extends com.google.android.gms.maps.MapView implements Goog
             map.setTrafficEnabled(value);
         }
     }
-
 
     @FunctionalInterface
     public interface EventCreator<T extends Event> {
@@ -703,7 +702,7 @@ public class MapView extends com.google.android.gms.maps.MapView implements Goog
         setShowsUserLocation(showUserLocation);
         setShowsMyLocationButton(showsMyLocationButton);
         setShowsTraffic(showsTraffic);
-
+        setMapType(mapType);
         if (maxZoomLevel != null) {
             setMaxZoomLevel(maxZoomLevel);
         }
@@ -903,7 +902,7 @@ public class MapView extends com.google.android.gms.maps.MapView implements Goog
     }
 
     public void setShowsMyLocationButton(boolean showMyLocationButton) {
-    this.showsMyLocationButton = showMyLocationButton;
+        this.showsMyLocationButton = showMyLocationButton;
         if (map != null) {
             if (hasPermissions() || !showMyLocationButton) {
                 map.getUiSettings().setMyLocationButtonEnabled(showMyLocationButton);
@@ -920,6 +919,7 @@ public class MapView extends com.google.android.gms.maps.MapView implements Goog
     }
 
     public void setMapType(int mapType) {
+        this.mapType = mapType;
         if (map != null) {
             map.setMapType(mapType);
         }
@@ -1117,12 +1117,12 @@ public class MapView extends com.google.android.gms.maps.MapView implements Goog
             MapCircle circleView = (MapCircle) child;
             circleView.addToMap(circleCollection);
             features.put(index, circleView);
-        } else if (child instanceof MapUrlTile) {
-            MapUrlTile urlTileView = (MapUrlTile) child;
-            urlTileView.addToMap(map);
-            features.put(index, urlTileView);
         } else if (child instanceof MapWMSTile) {
             MapWMSTile urlTileView = (MapWMSTile) child;
+            urlTileView.addToMap(map);
+            features.put(index, urlTileView);
+        } else if (child instanceof MapUrlTile) {
+            MapUrlTile urlTileView = (MapUrlTile) child;
             urlTileView.addToMap(map);
             features.put(index, urlTileView);
         } else if (child instanceof MapLocalTile) {

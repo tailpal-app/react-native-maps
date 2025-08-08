@@ -4,7 +4,6 @@ package com.rnmaps.fabric;
 import android.util.Log;
 import android.view.View;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -13,8 +12,6 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.uimanager.LayoutShadowNode;
-import com.facebook.react.uimanager.ReactStylesDiffMap;
-import com.facebook.react.uimanager.StateWrapper;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.ViewManagerDelegate;
@@ -27,7 +24,6 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.MapColorScheme;
 import com.rnmaps.maps.MapMarker;
 import com.rnmaps.maps.MapView;
 import com.rnmaps.maps.SizeReportingShadowNode;
@@ -49,7 +45,6 @@ public class MapViewManager extends ViewGroupManager<MapView> implements RNMapsM
     public MapViewManager(ReactApplicationContext context) {
         super(context);
     }
-
 
     @Override
     public ViewManagerDelegate<MapView> getDelegate() {
@@ -85,96 +80,6 @@ public class MapViewManager extends ViewGroupManager<MapView> implements RNMapsM
     protected void setupViewRecycling() {
         // override parent to block recycling / allow reliable GoogleMapsOptions passing
     }
-
-    private GoogleMapOptions optionsForInitialProps(ReactStylesDiffMap initialProps) {
-        GoogleMapOptions options = new GoogleMapOptions();
-        if (initialProps != null) {
-            setGoogleRenderer(null, initialProps.getString("googleRenderer"));
-            if (initialProps.hasKey("liteMode")) {
-                options.liteMode(initialProps.getBoolean("liteMode", false));
-            }
-            if (initialProps.hasKey("googleMapId")) {
-                String googleMapId = initialProps.getString("googleMapId");
-                options.mapId(googleMapId);
-            }
-            if (initialProps.getMap("initialCamera") != null) {
-                ReadableMap initialCamera = initialProps.getMap("initialCamera");
-                CameraPosition camera = MapView.cameraPositionFromMap(initialCamera);
-                if (camera != null) {
-                    options.camera(camera);
-                }
-            }
-            if (initialProps.hasKey("mapType")) {
-                if (initialProps.getString("mapType") != null) {
-                    options.mapType(mapTypeFromStrValue(initialProps.getString("mapType")));
-                }
-            }
-            if (initialProps.hasKey("minZoom")) {
-                if (initialProps.getInt("minZoom", 0) != 0) {
-                    options.minZoomPreference(initialProps.getInt("minZoom", 0));
-                }
-            }
-            if (initialProps.hasKey("maxZoom")) {
-                if (initialProps.getInt("maxZoom", 0) != 0) {
-                    options.maxZoomPreference(initialProps.getInt("maxZoom", 0));
-                }
-            }
-            if (initialProps.hasKey("userInterfaceStyle") && !initialProps.hasKey("liteMode")) {
-                String style = initialProps.getString("userInterfaceStyle");
-                if ("system".equals(style)) {
-                    options.mapColorScheme(MapColorScheme.FOLLOW_SYSTEM);
-                } else if ("light".equals(style)) {
-                    options.mapColorScheme(MapColorScheme.LIGHT);
-                } else if ("dark".equals(style)) {
-                    options.mapColorScheme(MapColorScheme.DARK);
-                }
-            }
-            if (initialProps.hasKey("pitchEnabled")) {
-                options.tiltGesturesEnabled(initialProps.getBoolean("pitchEnabled", true));
-            }
-            if (initialProps.hasKey("rotateEnabled")) {
-                options.rotateGesturesEnabled(initialProps.getBoolean("rotateEnabled", true));
-            }
-            if (initialProps.hasKey("scrollDuringRotateOrZoomEnabled")) {
-                options.scrollGesturesEnabledDuringRotateOrZoom(initialProps.getBoolean("scrollDuringRotateOrZoomEnabled", true));
-            }
-            if (initialProps.hasKey("scrollEnabled")) {
-                options.scrollGesturesEnabled(initialProps.getBoolean("scrollEnabled", true));
-            }
-            if (initialProps.hasKey("showsCompass")) {
-                options.compassEnabled(initialProps.getBoolean("showsCompass", true));
-            }
-            if (initialProps.hasKey("toolbarEnabled")) {
-                options.mapToolbarEnabled(initialProps.getBoolean("toolbarEnabled", true));
-            }
-            if (initialProps.hasKey("zoomControlEnabled")) {
-                options.zoomControlsEnabled(initialProps.getBoolean("zoomControlEnabled", true));
-            }
-            if (initialProps.hasKey("zoomEnabled")) {
-                options.zoomGesturesEnabled(initialProps.getBoolean("zoomEnabled", true));
-            }
-        }
-        return options;
-    }
-
-    @Override
-    protected MapView createViewInstance(int reactTag, @NonNull ThemedReactContext reactContext, @Nullable ReactStylesDiffMap initialProps, @Nullable StateWrapper stateWrapper) {
-        MapView view = null;
-        view = new MapView(reactContext, optionsForInitialProps(initialProps));
-        view.setId(reactTag);
-        this.addEventEmitters(reactContext, view);
-        if (initialProps != null) {
-            this.updateProperties(view, initialProps);
-        }
-        if (stateWrapper != null) {
-            Object extraData = this.updateState(view, initialProps, stateWrapper);
-            if (extraData != null) {
-                this.updateExtraData(view, extraData);
-            }
-        }
-        return view;
-    }
-
 
     public static final String REACT_CLASS = "RNMapsMapView";
 

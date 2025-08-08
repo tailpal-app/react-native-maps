@@ -79,7 +79,7 @@ public class MapsPackage extends BaseReactPackage implements ReactPackage {
     if (LocalTileManager.REACT_CLASS.equals(name)) {
       return new LocalTileManager(reactContext);
     }
-    if (NativeAirMapsModuleSpec.NAME.equals(name)) {
+    if (NativeAirMapsModule.REACT_CLASS.equals(name)) {
       return new NativeAirMapsModule(reactContext);
     } else {
       return null;
