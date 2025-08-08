@@ -17,19 +17,11 @@ import com.facebook.react.viewmanagers.RNMapsPolylineManagerDelegate;
 import com.facebook.react.viewmanagers.RNMapsPolylineManagerInterface;
 import com.rnmaps.maps.MapPolyline;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @ReactModule(name = PolylineManager.REACT_CLASS)
 public class PolylineManager extends ViewGroupManager<MapPolyline> implements RNMapsPolylineManagerInterface<MapPolyline> {
-    private DisplayMetrics metrics;
 
     public PolylineManager(ReactApplicationContext context) {
         super(context);
-        metrics = new DisplayMetrics();
-        ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE))
-                .getDefaultDisplay()
-                .getRealMetrics(metrics);
     }
 
     private final RNMapsPolylineManagerDelegate<MapPolyline, PolylineManager> delegate =
@@ -53,19 +45,6 @@ public class PolylineManager extends ViewGroupManager<MapPolyline> implements RN
 
     public static final String REACT_CLASS = "RNMapsPolyline";
 
-    @Nullable
-    @Override
-    public Map<String, Object> getExportedCustomBubblingEventTypeConstants() {
-        return MapPolyline.getExportedCustomBubblingEventTypeConstants();
-    }
-
-    @Nullable
-    @Override
-    public Map<String, Object> getExportedCustomDirectEventTypeConstants() {
-        return new HashMap<>();
-    }
-
-
     @Override
     public void setCoordinates(MapPolyline view, @Nullable ReadableArray value) {
         view.setCoordinates(value);
@@ -84,6 +63,7 @@ public class PolylineManager extends ViewGroupManager<MapPolyline> implements RN
 
     @Override
     public void setStrokeWidth(MapPolyline view, float value) {
+        DisplayMetrics metrics = view.getContext().getResources().getDisplayMetrics();
         float widthInScreenPx = metrics.density * value; // done for parity with iOS
         view.setWidth(widthInScreenPx);
     }

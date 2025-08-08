@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.common.MapBuilder;
 import com.google.android.gms.maps.model.ButtCap;
 import com.google.android.gms.maps.model.Cap;
 import com.google.android.gms.maps.model.Dash;
@@ -20,11 +19,9 @@ import com.google.android.gms.maps.model.SquareCap;
 import com.google.android.gms.maps.model.StrokeStyle;
 import com.google.android.gms.maps.model.StyleSpan;
 import com.google.maps.android.collections.PolylineManager;
-import com.rnmaps.fabric.event.OnPressEvent;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class MapPolyline extends MapFeature {
 
@@ -208,12 +205,6 @@ public class MapPolyline extends MapFeature {
                 break;
         }
         setLineCap(cap);
-    }
-
-    public static Map<String, Object> getExportedCustomBubblingEventTypeConstants() {
-        MapBuilder.Builder<String, Object> builder = MapBuilder.builder();
-        builder.put(OnPressEvent.EVENT_NAME, MapBuilder.of("registrationName", OnPressEvent.EVENT_NAME));
-        return builder.build();
     }
 
     public void setLineJoin(String lineJoin) {

@@ -13,9 +13,6 @@ import com.facebook.react.viewmanagers.RNMapsCircleManagerDelegate;
 import com.facebook.react.viewmanagers.RNMapsCircleManagerInterface;
 import com.rnmaps.maps.MapCircle;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @ReactModule(name = CircleManager.REACT_CLASS)
 public class CircleManager extends ViewGroupManager<MapCircle> implements RNMapsCircleManagerInterface<MapCircle> {
     public CircleManager(ReactApplicationContext context) {
@@ -42,20 +39,6 @@ public class CircleManager extends ViewGroupManager<MapCircle> implements RNMaps
 
 
     public static final String REACT_CLASS = "RNMapsCircle";
-
-    @Nullable
-    @Override
-    public Map<String, Object> getExportedCustomBubblingEventTypeConstants() {
-        return MapCircle.getExportedCustomBubblingEventTypeConstants();
-    }
-
-    @Nullable
-    @Override
-    public Map<String, Object> getExportedCustomDirectEventTypeConstants() {
-        return new HashMap<>();
-    }
-
-
 
     @Override
     public void setZIndex(MapCircle view, float value) {

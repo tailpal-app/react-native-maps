@@ -19,7 +19,6 @@ import com.facebook.react.viewmanagers.RNMapsMapViewManagerDelegate;
 import com.facebook.react.viewmanagers.RNMapsMapViewManagerInterface;
 import com.google.android.gms.location.Priority;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
@@ -31,8 +30,6 @@ import com.rnmaps.maps.SizeReportingShadowNode;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.Map;
 
 @ReactModule(name = MapViewManager.REACT_CLASS)
 public class MapViewManager extends ViewGroupManager<MapView> implements RNMapsMapViewManagerInterface<MapView> {
@@ -58,7 +55,7 @@ public class MapViewManager extends ViewGroupManager<MapView> implements RNMapsM
 
     @Override
     public MapView createViewInstance(ThemedReactContext context) {
-        return new MapView(context, new GoogleMapOptions());
+        return new MapView(context);
     }
 
     @Override
@@ -83,23 +80,11 @@ public class MapViewManager extends ViewGroupManager<MapView> implements RNMapsM
 
     public static final String REACT_CLASS = "RNMapsMapView";
 
-    @Nullable
-    @Override
-    public Map<String, Object> getExportedCustomBubblingEventTypeConstants() {
-        return MapView.getExportedCustomBubblingEventTypeConstants();
-    }
-
     @Override
     public LayoutShadowNode createShadowNodeInstance() {
         // A custom shadow node is needed in order to pass back the width/height of the map to the
         // view manager so that it can start applying camera moves with bounds.
         return new SizeReportingShadowNode();
-    }
-
-    @Nullable
-    @Override
-    public Map<String, Object> getExportedCustomDirectEventTypeConstants() {
-        return MapView.getExportedCustomDirectEventTypeConstants();
     }
 
     @Override

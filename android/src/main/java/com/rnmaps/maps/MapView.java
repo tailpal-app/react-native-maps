@@ -31,7 +31,6 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
-import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.UIManagerHelper;
 import com.facebook.react.uimanager.events.Event;
@@ -39,7 +38,6 @@ import com.facebook.react.uimanager.events.EventDispatcher;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -131,7 +129,7 @@ public class MapView extends com.google.android.gms.maps.MapView implements Goog
     private boolean showsMyLocationButton = false;
 
     private boolean showsTraffic = false;
-    private int mapType =1;
+    private int mapType = 1;
 
     private boolean handlePanDrag = false;
     private boolean moveOnMarkerPress = true;
@@ -235,9 +233,8 @@ public class MapView extends com.google.android.gms.maps.MapView implements Goog
         MapView.this.doDestroy();
     }
 
-    public MapView(ThemedReactContext context,
-                   GoogleMapOptions googleMapOptions) {
-        super(context, googleMapOptions);
+    public MapView(ThemedReactContext context) {
+        super(context);
         this.context = context;
         attachLifecycleObserver();
         MapView.this.getMapAsync(this);
@@ -608,40 +605,6 @@ public class MapView extends com.google.android.gms.maps.MapView implements Goog
         return checkSelfPermission(getContext(), PERMISSIONS[0]) == PermissionChecker.PERMISSION_GRANTED ||
                 checkSelfPermission(getContext(), PERMISSIONS[1]) == PermissionChecker.PERMISSION_GRANTED;
     }
-
-
-    public static Map<String, Object> getExportedCustomBubblingEventTypeConstants() {
-        MapBuilder.Builder<String, Object> builder = MapBuilder.builder();
-        builder.put(OnPressEvent.EVENT_NAME, MapBuilder.of("registrationName", OnPressEvent.EVENT_NAME));
-        builder.put(OnLongPressEvent.EVENT_NAME, MapBuilder.of("registrationName", OnLongPressEvent.EVENT_NAME));
-        return builder.build();
-    }
-
-    //                 , ,
-    public static Map<String, Object> getExportedCustomDirectEventTypeConstants() {
-        MapBuilder.Builder<String, Object> builder = MapBuilder.builder();
-        builder.put(OnMarkerPressEvent.EVENT_NAME, MapBuilder.of("registrationName", OnMarkerPressEvent.EVENT_NAME));
-        builder.put(OnCalloutPressEvent.EVENT_NAME, MapBuilder.of("registrationName", OnCalloutPressEvent.EVENT_NAME));
-        builder.put(OnMarkerDragEvent.EVENT_NAME, MapBuilder.of("registrationName", OnMarkerDragEvent.EVENT_NAME));
-        builder.put(OnMarkerDragStartEvent.EVENT_NAME, MapBuilder.of("registrationName", OnMarkerDragStartEvent.EVENT_NAME));
-        builder.put(OnMarkerDragEndEvent.EVENT_NAME, MapBuilder.of("registrationName", OnMarkerDragEndEvent.EVENT_NAME));
-        builder.put(OnPoiClickEvent.EVENT_NAME, MapBuilder.of("registrationName", OnPoiClickEvent.EVENT_NAME));
-        builder.put(OnDoublePressEvent.EVENT_NAME, MapBuilder.of("registrationName", OnDoublePressEvent.EVENT_NAME));
-        builder.put(OnPanDragEvent.EVENT_NAME, MapBuilder.of("registrationName", OnPanDragEvent.EVENT_NAME));
-        builder.put(OnMarkerSelectEvent.EVENT_NAME, MapBuilder.of("registrationName", OnMarkerSelectEvent.EVENT_NAME));
-        builder.put(OnMarkerDeselectEvent.EVENT_NAME, MapBuilder.of("registrationName", OnMarkerDeselectEvent.EVENT_NAME));
-        builder.put(OnMapLoadedEvent.EVENT_NAME, MapBuilder.of("registrationName", OnMapLoadedEvent.EVENT_NAME));
-        builder.put(OnMapReadyEvent.EVENT_NAME, MapBuilder.of("registrationName", OnMapReadyEvent.EVENT_NAME));
-        builder.put(OnUserLocationChangeEvent.EVENT_NAME, MapBuilder.of("registrationName", OnUserLocationChangeEvent.EVENT_NAME));
-        builder.put(OnRegionChangeEvent.EVENT_NAME, MapBuilder.of("registrationName", OnRegionChangeEvent.EVENT_NAME));
-        builder.put(OnRegionChangeStartEvent.EVENT_NAME, MapBuilder.of("registrationName", OnRegionChangeStartEvent.EVENT_NAME));
-        builder.put(OnRegionChangeCompleteEvent.EVENT_NAME, MapBuilder.of("registrationName", OnRegionChangeCompleteEvent.EVENT_NAME));
-        builder.put(OnIndoorBuildingFocusedEvent.EVENT_NAME, MapBuilder.of("registrationName", OnIndoorBuildingFocusedEvent.EVENT_NAME));
-        builder.put(OnIndoorLevelActivatedEvent.EVENT_NAME, MapBuilder.of("registrationName", OnIndoorLevelActivatedEvent.EVENT_NAME));
-        builder.put(OnKmlReadyEvent.EVENT_NAME, MapBuilder.of("registrationName", OnKmlReadyEvent.EVENT_NAME));
-        return builder.build();
-    }
-
 
     /*
     onDestroy is final method so I can't override it.
@@ -1198,45 +1161,6 @@ public class MapView extends com.google.android.gms.maps.MapView implements Goog
         event.putMap("position", position);
 
         return event;
-    }
-
-    public void updateExtraData(Object extraData) {
-        if (setPaddingDeferred && super.getHeight() > 0 && super.getWidth() > 0) {
-            CameraUpdate cu = CameraUpdateFactory.newCameraPosition(map.getCameraPosition());
-
-            map.setPadding(edgeLeftPadding + baseLeftMapPadding,
-                    edgeTopPadding + baseTopMapPadding,
-                    edgeRightPadding + baseRightMapPadding,
-                    edgeBottomPadding + baseBottomMapPadding);
-            map.moveCamera(cu);
-
-            // Move the google logo to the default base padding value.
-            map.setPadding(baseLeftMapPadding, baseTopMapPadding, baseRightMapPadding, baseBottomMapPadding);
-
-            setPaddingDeferred = false;
-        }
-
-        // if boundsToMove is not null, we now have the MapView's width/height, so we can apply
-        // a proper camera move
-        if (boundsToMove != null) {
-            HashMap<String, Float> data = (HashMap<String, Float>) extraData;
-            int width = data.get("width") == null ? 0 : data.get("width").intValue();
-            int height = data.get("height") == null ? 0 : data.get("height").intValue();
-
-            //fix for https://github.com/react-native-maps/react-native-maps/issues/245,
-            //it's not guaranteed the passed-in height and width would be greater than 0.
-            if (width <= 0 || height <= 0) {
-                map.moveCamera(CameraUpdateFactory.newLatLngBounds(boundsToMove, 0));
-            } else {
-                map.moveCamera(CameraUpdateFactory.newLatLngBounds(boundsToMove, width, height, 0));
-            }
-
-            boundsToMove = null;
-            cameraToSet = null;
-        } else if (cameraToSet != null) {
-            map.moveCamera(cameraToSet);
-            cameraToSet = null;
-        }
     }
 
     public void animateToCamera(CameraPosition position, int duration) {

@@ -13,9 +13,6 @@ import com.facebook.react.viewmanagers.RNMapsGooglePolygonManagerDelegate;
 import com.facebook.react.viewmanagers.RNMapsGooglePolygonManagerInterface;
 import com.rnmaps.maps.MapPolygon;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @ReactModule(name = PolygonManager.REACT_CLASS)
 public class PolygonManager extends ViewGroupManager<MapPolygon> implements RNMapsGooglePolygonManagerInterface<MapPolygon> {
 
@@ -43,19 +40,6 @@ public class PolygonManager extends ViewGroupManager<MapPolygon> implements RNMa
 
 
     public static final String REACT_CLASS = "RNMapsGooglePolygon";
-
-    @Nullable
-    @Override
-    public Map<String, Object> getExportedCustomBubblingEventTypeConstants() {
-        return MapPolygon.getExportedCustomBubblingEventTypeConstants();
-    }
-
-    @Nullable
-    @Override
-    public Map<String, Object> getExportedCustomDirectEventTypeConstants() {
-        return new HashMap<>();
-    }
-
 
     @Override
     public void setCoordinates(MapPolygon view, @Nullable ReadableArray value) {

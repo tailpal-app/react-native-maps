@@ -19,19 +19,14 @@ import com.facebook.imagepipeline.image.CloseableBitmap;
 import com.facebook.imagepipeline.image.CloseableImage;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
-import com.facebook.react.bridge.ReadableArray;
-import com.facebook.react.common.MapBuilder;
 import com.google.android.gms.common.images.ImageManager;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.GroundOverlay;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.maps.android.collections.GroundOverlayManager;
-import com.rnmaps.fabric.event.OnPressEvent;
 
-import java.util.Map;
 import java.util.concurrent.Executors;
 
 public class MapOverlay extends MapFeature {
@@ -172,12 +167,6 @@ public class MapOverlay extends MapFeature {
         if (groundOverlay != null) {
             groundOverlay.setClickable(tappable);
         }
-    }
-
-    public static Map<String, Object> getExportedCustomBubblingEventTypeConstants() {
-        MapBuilder.Builder<String, Object> builder = MapBuilder.builder();
-        builder.put(OnPressEvent.EVENT_NAME, MapBuilder.of("registrationName", OnPressEvent.EVENT_NAME));
-        return builder.build();
     }
 
     public GroundOverlayOptions getGroundOverlayOptions() {

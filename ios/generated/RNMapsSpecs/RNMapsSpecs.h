@@ -66,29 +66,29 @@ namespace JS {
 @end
 @protocol NativeAirMapsModuleSpec <RCTBridgeModule, RCTTurboModule>
 
-- (void)getCamera:(double)tag
+- (void)getCamera:(NSInteger)tag
           resolve:(RCTPromiseResolveBlock)resolve
            reject:(RCTPromiseRejectBlock)reject;
-- (void)getMarkersFrames:(double)tag
+- (void)getMarkersFrames:(NSInteger)tag
              onlyVisible:(BOOL)onlyVisible
                  resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject;
-- (void)getMapBoundaries:(double)tag
+- (void)getMapBoundaries:(NSInteger)tag
                  resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject;
-- (void)takeSnapshot:(double)tag
+- (void)takeSnapshot:(NSInteger)tag
               config:(NSString *)config
              resolve:(RCTPromiseResolveBlock)resolve
               reject:(RCTPromiseRejectBlock)reject;
-- (void)getAddressFromCoordinates:(double)tag
+- (void)getAddressFromCoordinates:(NSInteger)tag
                        coordinate:(JS::NativeAirMapsModule::LatLng &)coordinate
                           resolve:(RCTPromiseResolveBlock)resolve
                            reject:(RCTPromiseRejectBlock)reject;
-- (void)getPointForCoordinate:(double)tag
+- (void)getPointForCoordinate:(NSInteger)tag
                    coordinate:(JS::NativeAirMapsModule::LatLng &)coordinate
                       resolve:(RCTPromiseResolveBlock)resolve
                        reject:(RCTPromiseRejectBlock)reject;
-- (void)getCoordinateForPoint:(double)tag
+- (void)getCoordinateForPoint:(NSInteger)tag
                         point:(JS::NativeAirMapsModule::Point &)point
                       resolve:(RCTPromiseResolveBlock)resolve
                        reject:(RCTPromiseRejectBlock)reject;

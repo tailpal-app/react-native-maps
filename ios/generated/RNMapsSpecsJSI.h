@@ -163,13 +163,13 @@ protected:
   NativeAirMapsModuleCxxSpecJSI(std::shared_ptr<CallInvoker> jsInvoker);
 
 public:
-  virtual jsi::Value getCamera(jsi::Runtime &rt, double tag) = 0;
-  virtual jsi::Value getMarkersFrames(jsi::Runtime &rt, double tag, bool onlyVisible) = 0;
-  virtual jsi::Value getMapBoundaries(jsi::Runtime &rt, double tag) = 0;
-  virtual jsi::Value takeSnapshot(jsi::Runtime &rt, double tag, jsi::String config) = 0;
-  virtual jsi::Value getAddressFromCoordinates(jsi::Runtime &rt, double tag, jsi::Object coordinate) = 0;
-  virtual jsi::Value getPointForCoordinate(jsi::Runtime &rt, double tag, jsi::Object coordinate) = 0;
-  virtual jsi::Value getCoordinateForPoint(jsi::Runtime &rt, double tag, jsi::Object point) = 0;
+  virtual jsi::Value getCamera(jsi::Runtime &rt, int tag) = 0;
+  virtual jsi::Value getMarkersFrames(jsi::Runtime &rt, int tag, bool onlyVisible) = 0;
+  virtual jsi::Value getMapBoundaries(jsi::Runtime &rt, int tag) = 0;
+  virtual jsi::Value takeSnapshot(jsi::Runtime &rt, int tag, jsi::String config) = 0;
+  virtual jsi::Value getAddressFromCoordinates(jsi::Runtime &rt, int tag, jsi::Object coordinate) = 0;
+  virtual jsi::Value getPointForCoordinate(jsi::Runtime &rt, int tag, jsi::Object coordinate) = 0;
+  virtual jsi::Value getCoordinateForPoint(jsi::Runtime &rt, int tag, jsi::Object point) = 0;
 
 };
 
@@ -200,7 +200,7 @@ private:
 
     }
 
-    jsi::Value getCamera(jsi::Runtime &rt, double tag) override {
+    jsi::Value getCamera(jsi::Runtime &rt, int tag) override {
       static_assert(
           bridging::getParameterCount(&T::getCamera) == 2,
           "Expected getCamera(...) to have 2 parameters");
@@ -208,7 +208,7 @@ private:
       return bridging::callFromJs<jsi::Value>(
           rt, &T::getCamera, jsInvoker_, instance_, std::move(tag));
     }
-    jsi::Value getMarkersFrames(jsi::Runtime &rt, double tag, bool onlyVisible) override {
+    jsi::Value getMarkersFrames(jsi::Runtime &rt, int tag, bool onlyVisible) override {
       static_assert(
           bridging::getParameterCount(&T::getMarkersFrames) == 3,
           "Expected getMarkersFrames(...) to have 3 parameters");
@@ -216,7 +216,7 @@ private:
       return bridging::callFromJs<jsi::Value>(
           rt, &T::getMarkersFrames, jsInvoker_, instance_, std::move(tag), std::move(onlyVisible));
     }
-    jsi::Value getMapBoundaries(jsi::Runtime &rt, double tag) override {
+    jsi::Value getMapBoundaries(jsi::Runtime &rt, int tag) override {
       static_assert(
           bridging::getParameterCount(&T::getMapBoundaries) == 2,
           "Expected getMapBoundaries(...) to have 2 parameters");
@@ -224,7 +224,7 @@ private:
       return bridging::callFromJs<jsi::Value>(
           rt, &T::getMapBoundaries, jsInvoker_, instance_, std::move(tag));
     }
-    jsi::Value takeSnapshot(jsi::Runtime &rt, double tag, jsi::String config) override {
+    jsi::Value takeSnapshot(jsi::Runtime &rt, int tag, jsi::String config) override {
       static_assert(
           bridging::getParameterCount(&T::takeSnapshot) == 3,
           "Expected takeSnapshot(...) to have 3 parameters");
@@ -232,7 +232,7 @@ private:
       return bridging::callFromJs<jsi::Value>(
           rt, &T::takeSnapshot, jsInvoker_, instance_, std::move(tag), std::move(config));
     }
-    jsi::Value getAddressFromCoordinates(jsi::Runtime &rt, double tag, jsi::Object coordinate) override {
+    jsi::Value getAddressFromCoordinates(jsi::Runtime &rt, int tag, jsi::Object coordinate) override {
       static_assert(
           bridging::getParameterCount(&T::getAddressFromCoordinates) == 3,
           "Expected getAddressFromCoordinates(...) to have 3 parameters");
@@ -240,7 +240,7 @@ private:
       return bridging::callFromJs<jsi::Value>(
           rt, &T::getAddressFromCoordinates, jsInvoker_, instance_, std::move(tag), std::move(coordinate));
     }
-    jsi::Value getPointForCoordinate(jsi::Runtime &rt, double tag, jsi::Object coordinate) override {
+    jsi::Value getPointForCoordinate(jsi::Runtime &rt, int tag, jsi::Object coordinate) override {
       static_assert(
           bridging::getParameterCount(&T::getPointForCoordinate) == 3,
           "Expected getPointForCoordinate(...) to have 3 parameters");
@@ -248,7 +248,7 @@ private:
       return bridging::callFromJs<jsi::Value>(
           rt, &T::getPointForCoordinate, jsInvoker_, instance_, std::move(tag), std::move(coordinate));
     }
-    jsi::Value getCoordinateForPoint(jsi::Runtime &rt, double tag, jsi::Object point) override {
+    jsi::Value getCoordinateForPoint(jsi::Runtime &rt, int tag, jsi::Object point) override {
       static_assert(
           bridging::getParameterCount(&T::getCoordinateForPoint) == 3,
           "Expected getCoordinateForPoint(...) to have 3 parameters");

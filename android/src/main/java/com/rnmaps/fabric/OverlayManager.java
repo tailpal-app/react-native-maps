@@ -15,9 +15,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.rnmaps.maps.MapOverlay;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @ReactModule(name = OverlayManager.REACT_CLASS)
 public class OverlayManager extends ViewGroupManager<MapOverlay> implements RNMapsOverlayManagerInterface<MapOverlay> {
     public OverlayManager(ReactApplicationContext context) {
@@ -44,20 +41,6 @@ public class OverlayManager extends ViewGroupManager<MapOverlay> implements RNMa
 
 
     public static final String REACT_CLASS = "RNMapsOverlay";
-
-    @Nullable
-    @Override
-    public Map<String, Object> getExportedCustomBubblingEventTypeConstants() {
-        return MapOverlay.getExportedCustomBubblingEventTypeConstants();
-    }
-
-    @Nullable
-    @Override
-    public Map<String, Object> getExportedCustomDirectEventTypeConstants() {
-        return new HashMap<>();
-    }
-
-
 
     @Override
     public void setZIndex(MapOverlay view, float value) {

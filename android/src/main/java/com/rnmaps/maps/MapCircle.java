@@ -3,14 +3,10 @@ package com.rnmaps.maps;
 import android.content.Context;
 
 import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.common.MapBuilder;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.collections.CircleManager;
-import com.rnmaps.fabric.event.OnPressEvent;
-
-import java.util.Map;
 
 public class MapCircle extends MapFeature {
 
@@ -34,12 +30,6 @@ public class MapCircle extends MapFeature {
     if (circle != null) {
       circle.setCenter(this.center);
     }
-  }
-
-  public static Map<String, Object> getExportedCustomBubblingEventTypeConstants() {
-    MapBuilder.Builder<String, Object> builder = MapBuilder.builder();
-    builder.put(OnPressEvent.EVENT_NAME, MapBuilder.of("registrationName", OnPressEvent.EVENT_NAME));
-    return builder.build();
   }
 
   public void setRadius(double radius) {

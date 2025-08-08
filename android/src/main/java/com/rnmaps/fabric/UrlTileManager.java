@@ -10,11 +10,7 @@ import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.ViewManagerDelegate;
 import com.facebook.react.viewmanagers.RNMapsUrlTileManagerDelegate;
 import com.facebook.react.viewmanagers.RNMapsUrlTileManagerInterface;
-import com.rnmaps.maps.MapPolyline;
 import com.rnmaps.maps.MapUrlTile;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @ReactModule(name = UrlTileManager.REACT_CLASS)
 public class UrlTileManager extends ViewGroupManager<MapUrlTile> implements RNMapsUrlTileManagerInterface<MapUrlTile> {
@@ -40,19 +36,6 @@ public class UrlTileManager extends ViewGroupManager<MapUrlTile> implements RNMa
     @Override
     public MapUrlTile createViewInstance(ThemedReactContext context) {
         return new MapUrlTile(context);
-    }
-
-
-    @Nullable
-    @Override
-    public Map<String, Object> getExportedCustomBubblingEventTypeConstants() {
-        return new HashMap<>();
-    }
-
-    @Nullable
-    @Override
-    public Map<String, Object> getExportedCustomDirectEventTypeConstants() {
-        return new HashMap<>();
     }
 
     @Override

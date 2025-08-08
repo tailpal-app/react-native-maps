@@ -1,13 +1,11 @@
 package com.rnmaps.maps;
 
 import android.content.Context;
-import android.graphics.Color;
 
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.UIManagerHelper;
 import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.EventDispatcher;
@@ -18,11 +16,9 @@ import com.google.android.gms.maps.model.PatternItem;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.maps.android.collections.PolygonManager;
-import com.rnmaps.fabric.event.OnPressEvent;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class MapPolygon extends MapFeature {
 
@@ -44,12 +40,6 @@ public class MapPolygon extends MapFeature {
     super(context);
     strokeWidth = 10;
   }
-
-    public static Map<String, Object> getExportedCustomBubblingEventTypeConstants() {
-      MapBuilder.Builder<String, Object> builder = MapBuilder.builder();
-      builder.put(OnPressEvent.EVENT_NAME, MapBuilder.of("registrationName", OnPressEvent.EVENT_NAME));
-      return builder.build();
-    }
 
   public  <T extends Event> void dispatchEvent(WritableMap payload, MapView.EventCreator<T> creator, ReactContext reactContext) {
 

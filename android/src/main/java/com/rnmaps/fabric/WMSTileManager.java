@@ -12,9 +12,6 @@ import com.facebook.react.viewmanagers.RNMapsWMSTileManagerDelegate;
 import com.facebook.react.viewmanagers.RNMapsWMSTileManagerInterface;
 import com.rnmaps.maps.MapWMSTile;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @ReactModule(name = WMSTileManager.REACT_CLASS)
 public class WMSTileManager extends ViewGroupManager<MapWMSTile> implements RNMapsWMSTileManagerInterface<MapWMSTile> {
     public static final String REACT_CLASS = "RNMapsWMSTile";
@@ -39,19 +36,6 @@ public class WMSTileManager extends ViewGroupManager<MapWMSTile> implements RNMa
     @Override
     public MapWMSTile createViewInstance(ThemedReactContext context) {
         return new MapWMSTile(context);
-    }
-
-
-    @Nullable
-    @Override
-    public Map<String, Object> getExportedCustomBubblingEventTypeConstants() {
-        return new HashMap<>();
-    }
-
-    @Nullable
-    @Override
-    public Map<String, Object> getExportedCustomDirectEventTypeConstants() {
-        return new HashMap<>();
     }
 
     @Override

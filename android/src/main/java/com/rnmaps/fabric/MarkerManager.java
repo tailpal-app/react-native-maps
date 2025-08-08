@@ -176,18 +176,6 @@ public class MarkerManager extends ViewGroupManager<MapMarker> implements RNMaps
 
     public static final String REACT_CLASS = "RNMapsMarker";
 
-    @Nullable
-    @Override
-    public Map<String, Object> getExportedCustomBubblingEventTypeConstants() {
-        return MapMarker.getExportedCustomBubblingEventTypeConstants();
-    }
-
-    @Nullable
-    @Override
-    public Map<String, Object> getExportedCustomDirectEventTypeConstants() {
-        return MapMarker.getExportedCustomDirectEventTypeConstants();
-    }
-
     @Override
     public void setAnchor(MapMarker view, @Nullable ReadableMap map) {
         double x = map != null && map.hasKey("x") ? map.getDouble("x") : 0.5;

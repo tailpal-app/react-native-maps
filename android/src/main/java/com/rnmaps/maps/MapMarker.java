@@ -35,7 +35,6 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.UIManagerHelper;
 import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.EventDispatcher;
@@ -46,14 +45,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.collections.MarkerManager;
-import com.rnmaps.fabric.event.OnDeselectEvent;
-import com.rnmaps.fabric.event.OnDragEndEvent;
-import com.rnmaps.fabric.event.OnDragEvent;
-import com.rnmaps.fabric.event.OnDragStartEvent;
-import com.rnmaps.fabric.event.OnPressEvent;
-import com.rnmaps.fabric.event.OnSelectEvent;
-
-import java.util.Map;
 
 public class MapMarker extends MapFeature {
 
@@ -631,21 +622,5 @@ public class MapMarker extends MapFeature {
 
     private BitmapDescriptor getBitmapDescriptorByName(String name) {
         return BitmapDescriptorFactory.fromResource(getDrawableResourceByName(name));
-    }
-
-    public static Map<String, Object> getExportedCustomBubblingEventTypeConstants() {
-        MapBuilder.Builder<String, Object> builder = MapBuilder.builder();
-        builder.put(OnPressEvent.EVENT_NAME, MapBuilder.of("registrationName", OnPressEvent.EVENT_NAME));
-        return builder.build();
-    }
-
-    public static Map<String, Object> getExportedCustomDirectEventTypeConstants() {
-        return MapBuilder.of(
-                OnSelectEvent.EVENT_NAME, MapBuilder.of("registrationName", OnSelectEvent.EVENT_NAME),
-                OnDeselectEvent.EVENT_NAME, MapBuilder.of("registrationName", OnDeselectEvent.EVENT_NAME),
-                OnDragEvent.EVENT_NAME, MapBuilder.of("registrationName", OnDragEvent.EVENT_NAME),
-                OnDragStartEvent.EVENT_NAME, MapBuilder.of("registrationName", OnDragStartEvent.EVENT_NAME),
-                OnDragEndEvent.EVENT_NAME, MapBuilder.of("registrationName", OnDragEndEvent.EVENT_NAME)
-        );
     }
 }

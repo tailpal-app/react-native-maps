@@ -1,8 +1,5 @@
 package com.rnmaps.fabric;
 
-
-import androidx.annotation.Nullable;
-
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.uimanager.LayoutShadowNode;
@@ -13,9 +10,6 @@ import com.facebook.react.viewmanagers.RNMapsCalloutManagerDelegate;
 import com.facebook.react.viewmanagers.RNMapsCalloutManagerInterface;
 import com.rnmaps.maps.MapCallout;
 import com.rnmaps.maps.SizeReportingShadowNode;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @ReactModule(name = CalloutManager.REACT_CLASS)
 public class CalloutManager extends ViewGroupManager<MapCallout> implements RNMapsCalloutManagerInterface<MapCallout> {
@@ -43,19 +37,6 @@ public class CalloutManager extends ViewGroupManager<MapCallout> implements RNMa
 
 
     public static final String REACT_CLASS = "RNMapsCallout";
-
-    @Nullable
-    @Override
-    public Map<String, Object> getExportedCustomBubblingEventTypeConstants() {
-        return MapCallout.getExportedCustomBubblingEventTypeConstants();
-    }
-
-    @Nullable
-    @Override
-    public Map<String, Object> getExportedCustomDirectEventTypeConstants() {
-        return new HashMap<>();
-    }
-
 
     @Override
     public void setAlphaHitTest(MapCallout view, boolean value) {
