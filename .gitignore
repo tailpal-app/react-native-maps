@@ -4,7 +4,7 @@
 
 # Xcode
 #
-build/
+# build/
 buildoutput.txt
 *.pbxuser
 !default.pbxuser
@@ -28,7 +28,7 @@ AirMapsExplorer.xcworkspace/
 
 # Android/IntelliJ
 #
-build/
+# build/
 .idea
 .gradle
 local.properties
